@@ -1,9 +1,15 @@
 from urllib.request import urlretrieve
+from rich.markdown import Markdown
+from ollama import AsyncClient
+from rich import print
 import subprocess
 import platform
+import readline
 import asyncio
-import psutil    
+import psutil
+import ollama
 import stat
+import sys
 import os
 from subprocess import Popen, PIPE, STDOUT
 try:
@@ -12,9 +18,17 @@ except ImportError:
     import os
     DEVNULL = open(os.devnull, 'wb')
 
+class col:
+    green = '\033[92m'
+    red = '\033[93m'
+    red2 = '\033[91m'
+    reset = '\033[0m'
+    bold = '\033[1m'
+
+prompt = f"{col.bold}{col.green}::{col.reset}{col.bold} "
 ollama_exec_path = "./ollama"
 ollama_version = "v0.1.22"
-ollama_model = "orca-mini"
+ollama_model = "deepseek-coder"
 
 urls = {
     "darwin": f"https://github.com/ollama/ollama/releases/download/{ollama_version}/ollama-darwin",
@@ -78,6 +92,7 @@ async def ollama_check_models() -> bool :
     else: return False
 
 async def ollama_pull_model(model):
+    print(f"pulling {model}")
     result = subprocess.run([ollama_exec_path, "pull", model], stdout=subprocess.PIPE)
     pretty_result = result.stdout.decode("utf-8")
     print(pretty_result)
@@ -85,7 +100,45 @@ async def ollama_pull_model(model):
 async def ollama_run_model(model):
     p = Popen([ollama_exec_path, "serve"], stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
 
+async def chat():
+    while(True):
+        inp = input(prompt)
+
+        if inp == "exit":
+            exit(1)
+
+
+        message = { "role": "user", "content": inp }
+
+        if "markdown" or "code" in inp:
+            stream = ollama.chat(
+                model=ollama_model,
+                messages=[ message ],
+                stream=False,
+            )
+            print(f"{col.reset}\n")
+            print(Markdown(stream["message"]["content"]))
+            print("\n")
+        else:
+            stream = ollama.chat(
+                model=ollama_model,
+                messages=[ message ],
+                stream=True,
+            )
+            print(f"{col.reset}\n")
+            for chunk in stream:
+                print(chunk['message']['content'], end='', flush=True)
+            print("\n")
+
 async def main():
+
+    try:
+        if sys.argv[1] == "pull":
+            await ollama_pull_model(sys.argv[2])
+    except IndexError:
+        pass
+        
+
     # check if ollama executable is available
     ollama_available = os.path.isfile(ollama_exec_path)
     if ollama_available == False:
@@ -111,4 +164,9 @@ async def main():
 
     await ollama_run_model(ollama_model)
 
-asyncio.run(main())
+    await chat()
+
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    exit(0)
