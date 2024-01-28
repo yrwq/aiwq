@@ -110,25 +110,25 @@ async def chat():
 
         message = { "role": "user", "content": inp }
 
-        if "markdown" or "code" in inp:
-            stream = ollama.chat(
-                model=ollama_model,
-                messages=[ message ],
-                stream=False,
-            )
-            print(f"{col.reset}\n")
-            print(Markdown(stream["message"]["content"]))
-            print("\n")
-        else:
-            stream = ollama.chat(
-                model=ollama_model,
-                messages=[ message ],
-                stream=True,
-            )
-            print(f"{col.reset}\n")
-            for chunk in stream:
-                print(chunk['message']['content'], end='', flush=True)
-            print("\n")
+        # if "markdown" or "code" in inp:
+        #     stream = ollama.chat(
+        #         model=ollama_model,
+        #         messages=[ message ],
+        #         stream=False,
+        #     )
+        #     print("\n")
+        #     print(Markdown(stream["message"]["content"]))
+        #     print("\n")
+        # else:
+        stream = ollama.chat(
+            model=ollama_model,
+            messages=[ message ],
+            stream=True,
+        )
+        print("\n")
+        for chunk in stream:
+            print(chunk['message']['content'], end='', flush=True)
+        print("\n")
 
 async def main():
 
