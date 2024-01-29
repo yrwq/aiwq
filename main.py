@@ -28,7 +28,7 @@ class col:
 prompt = f"{col.bold}{col.green}::{col.reset}{col.bold} "
 ollama_exec_path = "./ollama"
 ollama_version = "v0.1.22"
-ollama_model = "deepseek-coder"
+ollama_model = "orca-mini"
 
 urls = {
     "darwin": f"https://github.com/ollama/ollama/releases/download/{ollama_version}/ollama-darwin",
