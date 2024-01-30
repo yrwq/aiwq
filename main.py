@@ -26,7 +26,7 @@ class col:
     bold = '\033[1m'
 
 prompt = f"{col.bold}{col.green}::{col.reset}{col.bold} "
-ollama_exec_path = "./ollama"
+ollama_exec_path = "bin/ollama"
 ollama_version = "v0.1.22"
 ollama_model = "orca-mini"
 
