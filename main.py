@@ -61,7 +61,7 @@ async def ollama_download():
                 case "arm64":
                     urlretrieve(urls["linux-arm"], ollama_exec_path)
                 case "x86_64":
-                    urlretrieve(urls["linux-arm"], ollama_exec_path)
+                    urlretrieve(urls["linux-x86_64"], ollama_exec_path)
                 case _:
                     print("sorry your platform is not supported by ollama")
                     exit(1)
